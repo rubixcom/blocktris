@@ -1,0 +1,40 @@
+			varying vec2 v_uv;
+			uniform float time;
+			uniform float score;
+
+			void main() {
+//				gl_FragColor = texture2D(texture1, v_uv); // Displays Nothing
+				//float rad = length(v_uv.x, v_uv.y);
+				//float angle = atan(v_uv.x, v_uv.y);
+
+				float rad = length(v_uv - vec2(0.5,0.5));
+				float ang = atan(v_uv.x-0.5, v_uv.y-0.5);
+
+                float xo = cos(time / 100.0) * score / 10000.0;
+                float yo = sin(time / 100.0) * score / 10000.0;
+
+				float rad2 = length(v_uv - vec2(0.5,0.5) - vec2(xo,yo));
+                float ang2 = atan(v_uv.x-0.5-xo, v_uv.y-0.5-yo);
+
+                float xl = cos(time / 200.0) * score / 1000.0;
+                float yl = sin(time / 200.0) * score / 1000.0;
+
+				float rad3 = length(v_uv - vec2(0.5,0.5) - vec2(xl,yl));
+                float ang3 = atan(v_uv.x-0.5-xl, v_uv.y-0.5-yl);
+
+				float squares = clamp(5.0 * abs(sin(v_uv.x * 124.5 + 10.0) * sin(v_uv.y * 124.5 + 10.0)), 0.0, 1.0);
+				float fade = clamp(1.0 - 2.0 * rad, 0.0, 1.0);
+
+				float circles = clamp(sin(200.0 / (1.0 - rad2 / 4.0) - time / 20.0), 0.5, 1.0 );
+				float spirals = abs(sin(ang3 * 10.0 + rad3 * 50.0 + time / 50.0));
+
+				float red = (cos(score / 100.0) + 1.0) / 4.0;
+				float green = (cos(score / 200.0) + 1.0) / 4.0;
+				float blue = (cos(score / 300.0) + 1.0) / 4.0;
+
+				gl_FragColor = fade * vec4(
+				            spirals * red + circles * green + squares * blue,
+							spirals * blue + circles * red + squares * green,
+							spirals * green + circles * blue + squares * red,
+							1.0);
+			}

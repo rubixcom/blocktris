@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>BlockTris by @rubixcom</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
+    <meta property="og:image" content="http://users.tpg.com.au/rubixcom/facebook.jpg"/>
+    <meta name="description" content="Free and easy to learn, 3D variant of Tetris or Frac 3D. Runs directly from your browser on most modern browsers and modern tablets/mobiles.">
+    <meta name="keywords" content="Tetris,3tris,Frac,Frac3D,Game,Free,3D,Online,Puzzle,Fun,Arcade,Retro,WebGL,Three.js,tesseract,rubixcom">
+    <meta name="author" content="@rubixcom">
+    <link rel="icon" type="image/png" href="resources/images/icons/icon.png"/>
+    <link rel="image_src" href="http://www.blocktris.com/facebook.jpg" />
+
+    <style>
+        body {
+            font-family: Monospace;
+            background-color: #0077ee;
+            margin: 0px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body style='-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;'
+      unselectable='on'
+      onselectstart='return false;'
+      onmousedown='return false;'
+      onload="bodyOnLoad();">
+
+<div
+        class="fb-like"
+        data-share="true"
+        data-width="450"
+        data-show-faces="true">
+</div>
+
+
+<script type="text/javascript" src="lib/three.min.js"></script>
+<script type="text/javascript" src="lib/RenderPass.js"></script>
+<script type="text/javascript" src="lib/CopyShader.js"></script>
+<script type="text/javascript" src="lib/ShaderPass.js"></script>
+<script type="text/javascript" src="lib/MaskPass.js"></script>
+<script type="text/javascript" src="lib/EffectComposer.js"></script>
+<script type="text/javascript" src="lib/FXAAShader.js"></script>
+<script type="text/javascript" src="lib/stats.min.js"></script>
+<script type="text/javascript" src="lib/THREEx.KeyboardState.js"></script>
+<script type="text/javascript" src='lib/threex.rendererstats.js'></script>
+<script type="text/javascript" src="lib/hammer.js"></script>
+<script type="text/javascript" src="lib/Detector.js"></script>
+<script type="text/javascript" src="lib/soundjs-0.5.2.min.js"></script>
+<script type="text/javascript" src="lib/preloadjs-0.4.1.min.js"></script>
+<script type="text/javascript" src="lib/ga.js"></script>
+<script type="text/javascript" src="lib/soundcloud.js"></script>
+<script type="text/javascript" src="lib/helvetiker_bold.typeface.js"></script>
+<script type="text/javascript" src="lib/helvetiker_regular.typeface.js"></script>
+<script type="text/javascript" src="lib/Baveuse_Regular.js"></script>
+<!-- script type="text/javascript" src="lib/App42-all-2.9.1.min.js" / -->
+<script type="text/javascript" src="js/game.js"></script>
+<script type="text/javascript" src="lib/sharebutton.js"></script>
+
+<img src="resources/images/titles/loading.png" name="loadingImg" style="max-width: 20%; max-height: 20%; bottom: 10%; margin: auto;overflow: auto;position: fixed;right: 0%;"/>
+<div name="loadingbox" id="loadingbox" style="width: 80%; height: 10%; align:right; overflow: none; margin: auto;position: fixed;right: 0;bottom: 0; padding:0px; margin:0px; text-align: right;">
+    <img name="p1" src="resources/images/counter/0.png" style="display: none;max-height: 100%; " />
+    <img name="p2" src="resources/images/counter/0.png" style="display: none;max-height: 100%; " />
+    <img name="p3" src="resources/images/counter/0.png" style="display: none;max-height: 100%; " />
+    <img name="p4" src="resources/images/counter/0.png" style="display: none;max-height: 100%; " />
+    <img name="p5" src="resources/images/counter/0.png" style="display: none;max-height: 100%; " />
+    <img name="p6" src="resources/images/counter/0.png" style="display: none;max-height: 100%; " />
+    <img name="percent" src="resources/images/titles/percent.png" style="display: none;max-height: 30%; vertical-align: top; " />
+</div>
+
+<!-- Score box -->
+<div name="scorebox" id="scorebox" style="display: none; width: 100%; height: 20%; align:right; overflow: none; margin: auto;position: fixed;right: 0;top: 0%; padding:0px; margin:0px; text-align: right; -webkit-filter: drop-shadow(10px 10px 20px black);">
+    <img name="s1" src="resources/images/counter/0.png" style="display: none;max-height: 50%; " />
+    <img name="s2" src="resources/images/counter/0.png" style="display: none;max-height: 50%; " />
+    <img name="s3" src="resources/images/counter/0.png" style="display: none;max-height: 50%; " />
+    <img name="s4" src="resources/images/counter/0.png" style="display: none;max-height: 50%; " />
+    <img name="s5" src="resources/images/counter/0.png" style="display: none;max-height: 50%; " />
+    <img name="s6" src="resources/images/counter/0.png" style="display: none;max-height: 50%; " />
+</div>
+
+<!-- Best Score box -->
+<div name="bestscorebox" style="width: 100%; height: 10%; align:middle; overflow: none; margin: auto;position: fixed;right:0;top: 0; padding:0px; margin:0px; text-align: right; -webkit-filter: hue-rotate(180deg);">
+    <img name="bestscore" src="resources/images/labels/best.png" style="display: none;max-height: 50%; " />
+    <img name="b1" src="resources/images/counter/0.png" style="display: none;max-height: 50%; " />
+    <img name="b2" src="resources/images/counter/0.png" style="display: none;max-height: 50%; " />
+    <img name="b3" src="resources/images/counter/0.png" style="display: none;max-height: 50%; " />
+    <img name="b4" src="resources/images/counter/0.png" style="display: none;max-height: 50%; " />
+    <img name="b5" src="resources/images/counter/0.png" style="display: none;max-height: 50%; " />
+    <img name="b6" src="resources/images/counter/0.png" style="display: none;max-height: 50%; " />
+</div>
+
+<!-- On Screen Controls -->
+<img style="height:8%; display: none; position:fixed; left:0%; top:0%; " src="resources/images/buttons/sound-off.png" name="soundtoggle" onmousedown="soundToggle();">
+<img style="height:8%; display: none; position:fixed; left:0%; top:8%; " src="resources/images/buttons/pause-btn.png" name="pause_btn" onmousedown="pauseUnpause();">
+<img style="height:8%; display: none; position:fixed; left:0%; top:16%; " src="resources/images/buttons/exit.png" name="scr_btn_exit" onmousedown="exit();">
+<table style="position:fixed; bottom:0%; width:100%; max-height:60mm;">
+    <tr>
+        <td align="left" valign="bottom" width="50%"><img style="width:100%; max-width:60mm; max-height:60mm; display: none;" name="move_pad" src="resources/images/buttons/move-rotate.png"/></td>
+        <td align="right" valign="bottom" width="50%"><img style="width:100%; max-width:60mm; max-height:60mm; display: none;" name="scr_btn_drop" src="resources/images/buttons/drop-f.png" /></td>
+    </tr>
+</table>
+
+<!--
+<img style="height:40%; display: none; position:fixed; left:1%; top:52%;" name="move_pad" src="move-rotate.png" />
+<img style="height:40%; display: none; position:fixed; right:1%; top:52%; " src="drop-f.png" name="scr_btn_drop" onmousedown="drop();">
+-->
+
+<!-- Prompts -->
+<!--
+<img src="resources/images/titles/splash.png" name="splashImg" onclick="splashOnClick();" style="display:none; max-width: 100%; max-height: 100%; bottom: 0; left: 0;margin: auto;overflow: auto;position: fixed;right: 0;top: 0;"/>
+
+<span style="position:fixed; top:0%; left:0%; width:100%; align: left; overflow: none; text-align: left; opacity: 10%;">
+    <span style="font-size:10pt; color: white;"> Ingredients: </span><br/><br/>
+    <span ><a href=""><img style="max-width:510%; " src="resources/images/logos/logo-html5.png"/></a></span>
+    <span ><a href=""><img style="max-width:10%; " src="resources/images/logos/logo-webgl.png"/></a></span>
+    <br/>
+    <span ><a href=""><img style="max-width:10%; " src="resources/images/logos/logo-threejs.png"/></a></span>
+    <span ><a href=""><img style="max-width:10%; " src="resources/images/logos/logo-keyboardstatejs.png"/></a></span>
+    <span ><a href=""><img style="max-width:10%; " src="resources/images/logos/logo-hammerjs.png"/></a></span>
+    <br/>
+    <span ><a href=""><img style="max-width:10%; " src="resources/images/logos/logo-soundsjs.png"/></a></span>
+    <span ><a href=""><img style="max-width:10%; " src="resources/images/logos/logo-preloadjs.png"/></a></span>
+</span>
+-->
+<img src="resources/images/titles/control-keys.png" name="controlKeys" style="display:none; max-width: 100%; max-height: 100%; bottom: 0; left: 0;margin: auto;overflow: auto;position: fixed;right: 0;top:85%;"/>
+<img src="resources/images/titles/start-msg.png" name="startMessage" style="display:none; max-width: 100%; max-height: 100%; bottom: 0; left: 0;margin: auto;overflow: auto;position: fixed;right: 0;top:90%;"/>
+<img src="resources/images/titles/pause.png" name="pauseMessage" style="display:none; max-width: 20%; left: 40%;position: fixed;top:50%;">
+
+<script src="//sharebutton.net/plugin/sharebutton.php?type=horizontal&u=http://users.tpg.com.au/rubixcom"/>
+
+
+<!-- iframe id="sc-widget" src="https://w.soundcloud.com/player/?url=https://soundcloud.com/trancemusic/gareth-emery-isolate" width="10%" height="10%" style="position: fixed;left: 0;top: 0;" scrolling="no" frameborder="no"></iframe -->
+<!-- script src="https://w.soundcloud.com/player/api.js" type="text/javascript"></script -->
+<!--
+<div id="likeButtons" class="fb-like" style="display: none; top: 0; left:0; margin: auto;overflow: auto;position: fixed;right: 0;" data-href="http://users.tpg.com.au/rubixcom/index.html" data-layout="button" data-action="like" data-show-faces="false" data-share="true"></div>
+-->
+<!--
+<iframe style="border: none; height: 250px; width: 250px;" allowtransparency="true" border="0" frameborder="0" src="http://d.cfjump.com/c/22201/1/?c4=17C6B3"></iframe>
+-->
+</body>
+</html>

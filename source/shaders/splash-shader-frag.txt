@@ -1,0 +1,58 @@
+	varying vec2 v_uv;
+	//uniform vec2 iResolution;
+	uniform float iGlobalTime;
+	uniform float opacity;
+
+	float hash( float n ) { return fract(sin(n)*753.5453123); }
+	float noise( in vec3 x )
+	{
+		vec3 p = floor(x);
+		vec3 f = fract(x);
+		f = f*f*(3.0-2.0*f);
+
+		float n = p.x + p.y*157.0 + 113.0*p.z;
+		return mix(mix(mix( hash(n+  0.0), hash(n+  1.0),f.x),
+					   mix( hash(n+157.0), hash(n+158.0),f.x),f.y),
+				   mix(mix( hash(n+113.0), hash(n+114.0),f.x),
+					   mix( hash(n+270.0), hash(n+271.0),f.x),f.y),f.z);
+	}
+
+	float map(in vec2 uv)
+	{
+		return (0.05/(4.*(-uv.y + (.1+.03*sin(uv.x * 10. + iGlobalTime)))));
+	 }
+
+	void main() {
+	//	vec2 R = iResolution.xy;
+	//	vec2 uv = (gl_FragCoord.xy-.5*R)/ R.y;
+		vec2 uv = v_uv / vec2(500.,100.) - vec2(1.0,.6);
+
+		vec2 pixelsize = 1.0 / vec2(1000.);//iResolution.xy;
+
+		vec3 o = vec3(uv.x,map(uv),uv.y);
+
+		vec3 nx = o;
+		nx.x += pixelsize.x;
+		nx.y = map(nx.xz);
+		nx.x = o.x + 1.0;
+		nx = normalize(nx - o);
+
+		vec3 nz = o;
+		nz.z += pixelsize.y;
+		nz.y = map(nz.xz);
+		nz.z = o.z + 1.0;
+		nz = normalize(nz - o);
+
+		vec3 normal = cross(nz,nx);
+
+		vec3 lightLoc = vec3(
+			.75*sin(iGlobalTime*.5),
+			.3,
+			.5*cos(iGlobalTime*.5));
+
+		vec3 lightVec = 5.*normalize(lightLoc - o);
+
+		gl_FragColor =
+			vec4(o.y > 0. ? 0.7 : 0.8, o.y < 0. ? 0.4 : 0.3 , o.y < 0. ? 0.7 : 0.,opacity) *
+			dot(normal,lightVec) / length(lightLoc - o);
+	}
